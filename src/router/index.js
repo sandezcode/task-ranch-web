@@ -5,13 +5,43 @@
  */
 
 // Composables
-import { createRouter, createWebHistory } from 'vue-router/auto'
-import { routes } from 'vue-router/auto-routes'
+import { createRouter, createWebHistory } from 'vue-router/auto';
+
+const routes = [
+  {
+    path: '/',
+    name: 'TaskRanch',
+    component: () => import('@/layouts/Land.vue'),
+    children: [
+      //---------------------------------------- Public Routes ----------------------------------------
+      // ...
+      //---------------------------------------- Private Routes ----------------------------------------
+      {
+        path: 'collaborator',
+        component: () => import('@/layouts/Collaborator.vue'),
+        children: [
+          {
+            path: 'to-do',
+            name: 'ToDoMain',
+            component: () => import('@/pages/to-do/Main.vue'),
+            children: [
+              {
+                path: '',
+                name: 'ToDo',
+                component: () => import('@/pages/to-do/pages/ToDo.vue')
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes,
-})
+  routes
+});
 
 // Workaround for https://github.com/vitejs/vite/issues/11804
 router.onError((err, to) => {
@@ -32,4 +62,4 @@ router.isReady().then(() => {
   localStorage.removeItem('vuetify:dynamic-reload')
 })
 
-export default router
+export default router;
