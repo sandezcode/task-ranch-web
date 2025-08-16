@@ -14,7 +14,16 @@ const routes = [
     component: () => import('@/layouts/Land.vue'),
     children: [
       //---------------------------------------- Public Routes ----------------------------------------
-      // ...
+      {
+        path: 'register',
+        name: 'Register',
+        component: () => import('@/pages/security/Register.vue')
+      },
+      {
+        path: 'login',
+        name: 'Login',
+        component: () => import('@/pages/security/Login.vue')
+      },
       //---------------------------------------- Private Routes ----------------------------------------
       {
         path: 'collaborator',
