@@ -1,6 +1,9 @@
 import { createStore } from 'vuex';
 
+import config from '@/config';
+
 const getDefaultState = () => ({
+  config: config,
   auth: false,
   user: {
     user_id: null,
