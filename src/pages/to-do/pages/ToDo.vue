@@ -25,14 +25,14 @@
     </v-toolbar>
 
     <v-sheet color="transparent" class="mt-4 ga-4 d-flex flex-wrap justify-center">
-      <template v-if="false">
+      <template v-if="true">
         <template v-for="n in 10">
           <v-card :width="($vuetify.display.xs) ? '100%' : '450'" variant="flat" rounded="lg" border
                   class="pa-2 align-self-baseline border-b-xl border-warning"
           >
             <v-card-item>
               <template v-slot:prepend>
-                <v-avatar icon="mdi-text" variant="tonal" size="40"></v-avatar>
+                <v-avatar color="secondary" icon="mdi-pin" variant="tonal" size="40"></v-avatar>
               </template>
 
               <v-card-title>Gestionar inventarios</v-card-title>
@@ -67,7 +67,6 @@
         <v-sheet color="transparent" :height="$vuetify.display.height - 180">
           <v-empty-state>
             <template v-slot:media>
-              <!--<v-icon color="tertiary" size="150">mdi-card-outline</v-icon>-->
               <v-img src="@/assets/illustrations/undraw_dog_walking_w27q.png" height="200"></v-img>
             </template>
             <template v-slot:title>
