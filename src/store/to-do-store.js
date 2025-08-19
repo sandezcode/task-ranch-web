@@ -42,6 +42,18 @@ const toDoStore = {
     setTask(state, task){
       state.tasks.unshift(task);
     },
+    setTaskUpdate(state, newTaskUpdate){
+      state.tasks.forEach((task) => {
+        if(task.task_id === newTaskUpdate.task_id){
+          Object.entries(newTaskUpdate).forEach(([key, value]) => {
+            task[key] = value;
+          });
+        }
+      });
+    },
+    setCurrentTask(state, currentTask){
+      state.current_task = currentTask;
+    },
     //-------------------- Reset data --------------------
     resetCurrentTask(state){
       state.current_task = getDefaultState().current_task;
