@@ -4,6 +4,10 @@
       <v-toolbar-title class="ml-0 text-primary text-h4">Por hacer</v-toolbar-title>
 
       <template v-slot:append>
+        <v-btn :icon="($vuetify.theme.global.current.dark) ? 'mdi-weather-night' : 'mdi-weather-sunny'" variant="plain"
+               v-on:click="toggleTheme"
+        ></v-btn>
+
         <v-switch v-model="only_my_tasks" color="success" density="compact" inset hide-details></v-switch>
       </template>
 
@@ -192,6 +196,11 @@ export default {
       'setCurrentTask',
       'setDeleteDialog'
     ]),
+    toggleTheme(){
+      this.$vuetify.theme.global.name = (this.$vuetify.theme.global.current.dark) ? 'light' : 'dark';
+
+      localStorage.setItem('current_app_theme', this.$vuetify.theme.global.name);
+    },
     getTasks(){
       let requestOptions = {
         method: 'GET',
