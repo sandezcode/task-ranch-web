@@ -41,7 +41,9 @@
                           <v-avatar color="secondary" icon="mdi-pin" variant="tonal" size="40"></v-avatar>
                         </template>
 
-                        <v-card-title>{{ task.name }}</v-card-title>
+                        <v-card-title :class="{ 'text-decoration-line-through' : task.status === 1 }">
+                          {{ task.name }}
+                        </v-card-title>
                         <v-card-subtitle>Tarea de <strong>{{ task.user.name }}</strong></v-card-subtitle>
 
                         <template v-if="task.user.user_id === user.user_id" v-slot:append>
@@ -53,23 +55,41 @@
                               ></v-btn>
                             </template>
 
-                            <v-list density="compact" rounded="lg" class="pa-2">
-                              <v-list-item prepend-icon="mdi-square-edit-outline" slim rounded="lg"
-                                           v-on:click="openDialog('edit_dialog', task)"
-                              >
-                                <v-list-item-title>Editar</v-list-item-title>
-                              </v-list-item>
-                              <v-list-item prepend-icon="mdi-delete-outline" slim rounded="lg"
-                                           v-on:click="openDialog('delete_dialog', task)"
-                              >
-                                <v-list-item-title>Eliminar</v-list-item-title>
-                              </v-list-item>
-                            </v-list>
+                            <v-card rounded="lg">
+                              <v-list density="compact" class="pa-2">
+                                <template v-if="task.status === 0">
+                                  <v-list-item prepend-icon="mdi-square-edit-outline" slim rounded="lg"
+                                               v-on:click="openDialog('edit_dialog', task)"
+                                  >
+                                    <v-list-item-title>Editar</v-list-item-title>
+                                  </v-list-item>
+                                </template>
+
+                                <v-list-item prepend-icon="mdi-delete-outline" slim rounded="lg"
+                                             v-on:click="openDialog('delete_dialog', task)"
+                                >
+                                  <v-list-item-title>Eliminar</v-list-item-title>
+                                </v-list-item>
+                              </v-list>
+
+                              <v-divider></v-divider>
+
+                              <v-list density="compact" class="pa-2">
+                                <v-list-item base-color="torch" slim rounded="lg" :loading="is_loading"
+                                             :disabled="task.status === 1"
+                                             v-on:click="completeTask(task)"
+                                >
+                                  <v-list-item-title>Terminar tarea</v-list-item-title>
+                                </v-list-item>
+                              </v-list>
+                            </v-card>
                           </v-menu>
                         </template>
                       </v-card-item>
 
-                      <v-card-text>{{ task.description }}</v-card-text>
+                      <v-card-text :class="{ 'text-decoration-line-through' : task.status === 1 }">
+                        {{ task.description }}
+                      </v-card-text>
 
                       <v-card-subtitle class="text-right">
                         {{ task.start_date_human }}
@@ -151,7 +171,8 @@ export default {
   data: () => ({
     only_my_tasks: false,
     status: 'all',
-    is_loading_data: true
+    is_loading_data: true,
+    is_loading: true
   }),
   computed: {
     ...mapState({
@@ -167,6 +188,7 @@ export default {
     ...mapMutations('to_do_store', [
       'setFormStatus',
       'setTasks',
+      'setTaskUpdate',
       'setCurrentTask',
       'setDeleteDialog'
     ]),
@@ -213,6 +235,29 @@ export default {
           break;
         }
       }
+    },
+    completeTask(task){
+      this.is_loading = true;
+
+      let requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': this.getToken()
+        },
+        body: JSON.stringify({ task_id: task.task_id })
+      }
+
+      fetch(this.api('tasks/complete-task'), requestOptions)
+        .then(response => response.json())
+        .then((result) => {
+          this.is_loading = false;
+
+          if(result.success){
+            this.setTaskUpdate(result.data.task);
+          }
+        })
+        .catch(error => console.log('error', error));
     }
   }
 }
