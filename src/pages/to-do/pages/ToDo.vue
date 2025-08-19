@@ -52,6 +52,19 @@
                                      v-bind="props"
                               ></v-btn>
                             </template>
+
+                            <v-list density="compact" rounded="lg" class="pa-2">
+                              <v-list-item prepend-icon="mdi-square-edit-outline" slim rounded="lg"
+                                           v-on:click="openDialog('edit_dialog', task)"
+                              >
+                                <v-list-item-title>Editar</v-list-item-title>
+                              </v-list-item>
+                              <v-list-item prepend-icon="mdi-delete-outline" slim rounded="lg"
+                                           v-on:click="openDialog('delete_dialog', task)"
+                              >
+                                <v-list-item-title>Eliminar</v-list-item-title>
+                              </v-list-item>
+                            </v-list>
                           </v-menu>
                         </template>
                       </v-card-item>
@@ -150,7 +163,8 @@ export default {
     ]),
     ...mapMutations('to_do_store', [
       'setFormStatus',
-      'setTasks'
+      'setTasks',
+      'setCurrentTask'
     ]),
     getTasks(){
       let requestOptions = {
@@ -182,11 +196,11 @@ export default {
           break;
         }
         case 'edit_dialog': {
-          //this.setCurrentTask(currentTask);
-          /*this.setFormStatus({
+          this.setCurrentTask(currentTask);
+          this.setFormStatus({
             form_dialog: true,
             form_type: 'edit'
-          });*/
+          });
           break;
         }
         case 'delete_dialog': {
