@@ -4,7 +4,7 @@
          class="ma-2"
          style="z-index: 9999;"
   >
-    Marcos Torres
+    {{ user.name }}
   </v-btn>
 
   <v-main>
@@ -17,8 +17,15 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
-  name: 'Collaborator'
+  name: 'Collaborator',
+  computed: {
+    ...mapState({
+      user: state => state.user
+    })
+  }
 }
 </script>
 
