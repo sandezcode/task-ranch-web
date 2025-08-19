@@ -5,7 +5,7 @@ import config from '@/config';
 import toDoStore from '@/store/to-do-store';
 
 const getDefaultState = () => ({
-  config: config,
+  api: config.api,
   auth: false,
   user: {
     //-------------------- Model Properties --------------------
