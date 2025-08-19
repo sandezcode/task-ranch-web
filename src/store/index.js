@@ -53,6 +53,7 @@ export default createStore({
     },
     resetStore(context){
       context.commit('resetStore');
+      context.commit('to_do_store/resetStore');
     },
     clearLocalStorage(){
       localStorage.removeItem('auth');
