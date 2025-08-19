@@ -67,7 +67,7 @@ export default {
   }),
   computed: {
     ...mapState({
-      api: state => state.config.api
+      api: state => state.api
     })
   },
   methods: {
