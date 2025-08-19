@@ -9,13 +9,13 @@
 
       <template v-slot:extension>
         <v-btn-toggle v-model="status" color="primary" density="compact">
-          <v-btn text="Todo" class="text-none"></v-btn>
-          <v-btn text="Pendientes" class="text-none">
+          <v-btn text="Todo" value="all" class="text-none"></v-btn>
+          <v-btn text="Pendientes" value="0" class="text-none">
             <template v-slot:prepend>
               <v-icon color="warning">mdi-square-rounded</v-icon>
             </template>
           </v-btn>
-          <v-btn text="Completados" class="text-none">
+          <v-btn text="Completados" value="1" class="text-none">
             <template v-slot:prepend>
               <v-icon color="success">mdi-square-rounded</v-icon>
             </template>
@@ -27,38 +27,60 @@
     <template v-if="!is_loading_data">
       <v-sheet color="transparent" class="mt-4 ga-4 d-flex flex-wrap justify-center">
         <template v-if="to_do_store.tasks.length">
-          <template v-for="task in to_do_store.tasks">
-            <v-card :width="($vuetify.display.xs) ? '100%' : '450'" variant="flat" rounded="lg" border
-                    class="pa-2 align-self-baseline border-b-xl"
-                    :class="(task.status) ? 'border-success' : 'border-warning'"
-            >
-              <v-card-item>
-                <template v-slot:prepend>
-                  <v-avatar color="secondary" icon="mdi-pin" variant="tonal" size="40"></v-avatar>
+          <template v-if="status">
+            <template v-for="task in to_do_store.tasks">
+              <v-scale-transition>
+                <template v-if="(task.status === parseInt(status)) || (status === 'all')">
+                  <v-card :width="($vuetify.display.xs) ? '100%' : '450'" variant="flat" rounded="lg" border
+                          class="pa-2 align-self-baseline border-b-xl"
+                          :class="(task.status) ? 'border-success' : 'border-warning'"
+                  >
+                    <v-card-item>
+                      <template v-slot:prepend>
+                        <v-avatar color="secondary" icon="mdi-pin" variant="tonal" size="40"></v-avatar>
+                      </template>
+
+                      <v-card-title>{{ task.name }}</v-card-title>
+                      <v-card-subtitle>Tarea de <strong>{{ task.user.name }}</strong></v-card-subtitle>
+
+                      <template v-slot:append>
+                        <v-menu>
+                          <template v-slot:activator="{ props }">
+                            <v-btn color="tertiary" icon="mdi-dots-vertical" variant="text" position="absolute"
+                                   location="top end"
+                                   v-bind="props"
+                            ></v-btn>
+                          </template>
+                        </v-menu>
+                      </template>
+                    </v-card-item>
+
+                    <v-card-text>{{ task.description }}</v-card-text>
+
+                    <v-card-subtitle class="text-right">
+                      {{ task.start_date_human }}
+                      <v-icon :color="(task.status) ? 'success' : 'warning'">mdi-circle-medium</v-icon>
+                    </v-card-subtitle>
+                  </v-card>
                 </template>
-
-                <v-card-title>{{ task.name }}</v-card-title>
-                <v-card-subtitle>Tarea de <strong>{{ task.user.name }}</strong></v-card-subtitle>
-
-                <template v-slot:append>
-                  <v-menu>
-                    <template v-slot:activator="{ props }">
-                      <v-btn color="tertiary" icon="mdi-dots-vertical" variant="text" position="absolute"
-                             location="top end"
-                             v-bind="props"
-                      ></v-btn>
-                    </template>
-                  </v-menu>
+              </v-scale-transition>
+            </template>
+          </template>
+          <template v-else>
+            <v-sheet color="transparent" :height="$vuetify.display.height - 180">
+              <v-empty-state>
+                <template v-slot:media>
+                  <v-img src="@/assets/illustrations/undraw_taken_mshk.png" height="200"></v-img>
                 </template>
-              </v-card-item>
-
-              <v-card-text>{{ task.description }}</v-card-text>
-
-              <v-card-subtitle class="text-right">
-                {{ task.start_date_human }}
-                <v-icon :color="(task.status) ? 'success' : 'warning'">mdi-circle-medium</v-icon>
-              </v-card-subtitle>
-            </v-card>
+                <template v-slot:title>
+                  Usa los filtros para ver las tareas
+                </template>
+                <template v-slot:text>
+                  Selecciona una opción en los filtros de arriba (Todo, Pendientes o Completados) para mostrar tus
+                  tareas.
+                </template>
+              </v-empty-state>
+            </v-sheet>
           </template>
         </template>
         <template v-else>
@@ -109,7 +131,7 @@ export default {
     this.getTasks();
   },
   data: () => ({
-    status: 0,
+    status: 'all',
     is_loading_data: true
   }),
   computed: {
