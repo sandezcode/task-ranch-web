@@ -48,6 +48,12 @@
           Iniciar sesion
         </v-btn>
       </v-card-actions>
+
+      <v-card-item>
+        <div class="text-medium-emphasis text-center">
+          <router-link :to="{ name: 'Register' }" class="text-tertiary text-decoration-none">Regístrarme</router-link>
+        </div>
+      </v-card-item>
     </v-card>
   </v-sheet>
 </template>
