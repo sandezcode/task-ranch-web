@@ -79,17 +79,55 @@
         </v-sheet>
       </template>
     </v-sheet>
+
+    <v-fab color="primary" icon="mdi-plus" size="64" app v-on:click="openDialog('create_dialog')"></v-fab>
   </v-container>
 
-  <v-fab color="primary" icon="mdi-plus" size="64" app></v-fab>
+  <task-form-dialog></task-form-dialog>
 </template>
 
 <script>
+import { mapState, mapGetters, mapMutations } from 'vuex';
+
+import TaskFormDialog from '@/components/to-do/TaskFormDialog.vue';
+
 export default {
   name: 'ToDo',
+  components: {
+    TaskFormDialog
+  },
   data: () => ({
     status: 0
-  })
+  }),
+  methods: {
+    ...mapMutations('to_do_store', [
+      'setFormStatus'
+    ]),
+    openDialog(dialog, currentTask = {}){
+      switch(dialog){
+        case 'create_dialog': {
+          this.setFormStatus({
+            form_dialog: true,
+            form_type: 'create'
+          });
+          break;
+        }
+        case 'edit_dialog': {
+          //this.setCurrentTask(currentTask);
+          /*this.setFormStatus({
+            form_dialog: true,
+            form_type: 'edit'
+          });*/
+          break;
+        }
+        case 'delete_dialog': {
+          //this.setCurrentTask(currentTask);
+          //this.setDeleteDialog(true);
+          break;
+        }
+      }
+    }
+  }
 }
 </script>
 
