@@ -8,13 +8,13 @@ const getDefaultState = () => ({
   config: config,
   auth: false,
   user: {
+    //-------------------- Model Properties --------------------
     user_id: null,
     name: '',
-    role: null,
     email: '',
     email_verified_at: null,
-    phone_number: '',
-    phone_number_verified_at: null
+    //-------------------- Custom Properties --------------------
+    short_name: ''
   },
   token: {
     type: '',
