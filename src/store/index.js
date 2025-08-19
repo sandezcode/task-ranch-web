@@ -2,6 +2,8 @@ import { createStore } from 'vuex';
 
 import config from '@/config';
 
+import toDoStore from '@/store/to-do-store';
+
 const getDefaultState = () => ({
   config: config,
   auth: false,
@@ -59,6 +61,6 @@ export default createStore({
     }
   },
   modules: {
-    // ...
+    to_do_store: toDoStore
   }
 });
