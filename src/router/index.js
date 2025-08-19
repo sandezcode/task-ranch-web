@@ -6,6 +6,7 @@
 
 // Composables
 import { createRouter, createWebHistory } from 'vue-router/auto';
+import Store from '@/store';
 
 const routes = [
   {
@@ -41,7 +42,10 @@ const routes = [
               }
             ]
           }
-        ]
+        ],
+        meta: {
+          auth: true
+        }
       }
     ]
   }
@@ -50,6 +54,20 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes
+});
+
+router.beforeEach(async (to, from, next) => {
+  if(to.matched.some(route => route.meta.auth)){
+    await Store.dispatch('setUserData');
+
+    if(Store.state.auth){
+      next();
+    }else{
+      next({name: 'Login'});
+    }
+  }else{
+    next();
+  }
 });
 
 // Workaround for https://github.com/vitejs/vite/issues/11804
