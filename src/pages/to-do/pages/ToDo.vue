@@ -24,61 +24,70 @@
       </template>
     </v-toolbar>
 
-    <v-sheet color="transparent" class="mt-4 ga-4 d-flex flex-wrap justify-center">
-      <template v-if="true">
-        <template v-for="n in 10">
-          <v-card :width="($vuetify.display.xs) ? '100%' : '450'" variant="flat" rounded="lg" border
-                  class="pa-2 align-self-baseline border-b-xl border-warning"
-          >
-            <v-card-item>
-              <template v-slot:prepend>
-                <v-avatar color="secondary" icon="mdi-pin" variant="tonal" size="40"></v-avatar>
-              </template>
+    <template v-if="!is_loading_data">
+      <v-sheet color="transparent" class="mt-4 ga-4 d-flex flex-wrap justify-center">
+        <template v-if="to_do_store.tasks.length">
+          <template v-for="task in to_do_store.tasks">
+            <v-card :width="($vuetify.display.xs) ? '100%' : '450'" variant="flat" rounded="lg" border
+                    class="pa-2 align-self-baseline border-b-xl"
+                    :class="(task.status) ? 'border-success' : 'border-warning'"
+            >
+              <v-card-item>
+                <template v-slot:prepend>
+                  <v-avatar color="secondary" icon="mdi-pin" variant="tonal" size="40"></v-avatar>
+                </template>
 
-              <v-card-title>Gestionar inventarios</v-card-title>
-              <v-card-subtitle>
-                Tarea de <strong>Marco Torres</strong>
+                <v-card-title>{{ task.name }}</v-card-title>
+                <v-card-subtitle>Tarea de <strong>{{ task.user.name }}</strong></v-card-subtitle>
+
+                <template v-slot:append>
+                  <v-menu>
+                    <template v-slot:activator="{ props }">
+                      <v-btn color="tertiary" icon="mdi-dots-vertical" variant="text" position="absolute"
+                             location="top end"
+                             v-bind="props"
+                      ></v-btn>
+                    </template>
+                  </v-menu>
+                </template>
+              </v-card-item>
+
+              <v-card-text>{{ task.description }}</v-card-text>
+
+              <v-card-subtitle class="text-right">
+                {{ task.start_date_human }}
+                <v-icon :color="(task.status) ? 'success' : 'warning'">mdi-circle-medium</v-icon>
               </v-card-subtitle>
-
-              <template v-slot:append>
-                <v-menu>
-                  <template v-slot:activator="{ props }">
-                    <v-btn color="tertiary" icon="mdi-dots-vertical" variant="text" position="absolute"
-                           location="top end"
-                           v-bind="props"
-                    ></v-btn>
-                  </template>
-                </v-menu>
-              </template>
-            </v-card-item>
-
-            <v-card-text>
-              Lorem ipsum dolor sit amet consectetur, adipiscing elit pretium facilisis, scelerisque tortor hac class.
-              Aenean luctus mauris scelerisque parturient rhoncus leo fermentum orci tempus consequat, phasellus feugiat
-              volutpat montes sem facilisis cursus mollis sagittis tellus, proin per lobortis potenti eget habitant
-              pharetra penatibus imperdiet. Ante velit aliquet ad accumsan nisi diam ligula odio cubilia vel, orci
-              sociosqu senectus iaculis aenean vitae pretium dis hendrerit, per in libero molestie blandit sem cum
-              vestibulum eros.
-            </v-card-text>
-          </v-card>
+            </v-card>
+          </template>
         </template>
-      </template>
-      <template v-else>
-        <v-sheet color="transparent" :height="$vuetify.display.height - 180">
-          <v-empty-state>
-            <template v-slot:media>
-              <v-img src="@/assets/illustrations/undraw_dog_walking_w27q.png" height="200"></v-img>
-            </template>
-            <template v-slot:title>
-              ¡Todo bajo control!
-            </template>
-            <template v-slot:text>
-              No tienes tareas pendientes en este momento. Crea una nueva y sigue avanzando con tus objetivos.
-            </template>
-          </v-empty-state>
-        </v-sheet>
-      </template>
-    </v-sheet>
+        <template v-else>
+          <v-sheet color="transparent" :height="$vuetify.display.height - 180">
+            <v-empty-state>
+              <template v-slot:media>
+                <v-img src="@/assets/illustrations/undraw_dog_walking_w27q.png" height="200"></v-img>
+              </template>
+              <template v-slot:title>
+                ¡Todo bajo control!
+              </template>
+              <template v-slot:text>
+                No tienes tareas pendientes en este momento. Crea una nueva y sigue avanzando con tus objetivos.
+              </template>
+            </v-empty-state>
+          </v-sheet>
+        </template>
+      </v-sheet>
+    </template>
+    <template v-else>
+      <v-sheet color="transparent" class="mt-4 d-flex justify-center">
+        <v-card variant="text">
+          <v-card-item class="justify-center">
+            <v-progress-circular color="grey-lighten-1" indeterminate></v-progress-circular>
+          </v-card-item>
+          <v-card-subtitle>Cargando las tareas...</v-card-subtitle>
+        </v-card>
+      </v-sheet>
+    </template>
 
     <v-fab color="primary" icon="mdi-plus" size="64" app v-on:click="openDialog('create_dialog')"></v-fab>
   </v-container>
@@ -96,13 +105,47 @@ export default {
   components: {
     TaskFormDialog
   },
+  mounted(){
+    this.getTasks();
+  },
   data: () => ({
-    status: 0
+    status: 0,
+    is_loading_data: true
   }),
+  computed: {
+    ...mapState({
+      api: state => state.api,
+      to_do_store: state => state.to_do_store
+    })
+  },
   methods: {
-    ...mapMutations('to_do_store', [
-      'setFormStatus'
+    ...mapGetters([
+      'getToken'
     ]),
+    ...mapMutations('to_do_store', [
+      'setFormStatus',
+      'setTasks'
+    ]),
+    getTasks(){
+      let requestOptions = {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': this.getToken()
+        }
+      }
+
+      fetch(this.api('tasks'), requestOptions)
+        .then(response => response.json())
+        .then((result) => {
+          this.is_loading_data = false;
+
+          if(result.success){
+            this.setTasks(result.data.tasks);
+          }
+        })
+        .catch(error => console.log('error', error));
+    },
     openDialog(dialog, currentTask = {}){
       switch(dialog){
         case 'create_dialog': {
