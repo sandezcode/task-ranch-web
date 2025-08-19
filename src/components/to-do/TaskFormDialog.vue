@@ -87,10 +87,12 @@ export default {
     name: '',
     description: '',
     start_date: '',
-    is_loading: false
+    is_loading: false,
+    timeout: null
   }),
   computed: {
     ...mapState({
+      api: state => state.api,
       to_do_store: state => state.to_do_store
     }),
     getFormTitle(){
@@ -110,9 +112,11 @@ export default {
     ]),
     ...mapMutations('to_do_store', [
       'setFormStatus',
+      'setTask',
       'resetCurrentTask'
     ]),
     async processForm(){
+      clearTimeout(this.timeout);
       this.is_loading = true;
 
       let taskForm = await this.$refs.TaskForm.validate();
@@ -125,6 +129,37 @@ export default {
       }else{
         this.is_loading = false;
       }
+    },
+    createTask(){
+      let requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': this.getToken()
+        },
+        body: JSON.stringify({
+          name: this.name,
+          description: this.description,
+          start_date: this.start_date
+        })
+      }
+
+      fetch(this.api('tasks'), requestOptions)
+        .then(response => response.json())
+        .then((result) => {
+          this.is_loading = false;
+
+          if(result.success){
+            this.closeDialog();
+            this.setTask(result.data.task);
+          }else{
+            this.alert_type = 'error';
+            this.alert_messages = result.errors;
+            this.alert = true;
+            this.timeout = setTimeout(() => this.alert = false, 3000);
+          }
+        })
+        .catch(error => console.log('error', error));
     },
     clearFormData(){
       if(this.alert){
