@@ -130,17 +130,20 @@
   </v-container>
 
   <task-form-dialog></task-form-dialog>
+  <task-delete-dialog></task-delete-dialog>
 </template>
 
 <script>
 import { mapState, mapGetters, mapMutations } from 'vuex';
 
 import TaskFormDialog from '@/components/to-do/TaskFormDialog.vue';
+import TaskDeleteDialog from '@/components/to-do/TaskDeleteDialog.vue';
 
 export default {
   name: 'ToDo',
   components: {
-    TaskFormDialog
+    TaskFormDialog,
+    TaskDeleteDialog
   },
   mounted(){
     this.getTasks();
@@ -164,7 +167,8 @@ export default {
     ...mapMutations('to_do_store', [
       'setFormStatus',
       'setTasks',
-      'setCurrentTask'
+      'setCurrentTask',
+      'setDeleteDialog'
     ]),
     getTasks(){
       let requestOptions = {
@@ -204,8 +208,8 @@ export default {
           break;
         }
         case 'delete_dialog': {
-          //this.setCurrentTask(currentTask);
-          //this.setDeleteDialog(true);
+          this.setCurrentTask(currentTask);
+          this.setDeleteDialog(true);
           break;
         }
       }
