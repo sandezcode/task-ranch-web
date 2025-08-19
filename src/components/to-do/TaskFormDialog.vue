@@ -93,7 +93,8 @@ export default {
   computed: {
     ...mapState({
       api: state => state.api,
-      to_do_store: state => state.to_do_store
+      to_do_store: state => state.to_do_store,
+      current_task: state => state.to_do_store.current_task
     }),
     getFormTitle(){
       let formTitle = '';
@@ -106,6 +107,15 @@ export default {
       return formTitle;
     }
   },
+  watch: {
+    current_task(newCurrentTask){
+      if(this.to_do_store.form_type === 'edit'){
+        this.name = newCurrentTask.name;
+        this.description = newCurrentTask.description;
+        this.start_date = newCurrentTask.start_date;
+      }
+    }
+  },
   methods: {
     ...mapGetters([
       'getToken'
@@ -113,6 +123,7 @@ export default {
     ...mapMutations('to_do_store', [
       'setFormStatus',
       'setTask',
+      'setTaskUpdate',
       'resetCurrentTask'
     ]),
     async processForm(){
@@ -152,6 +163,37 @@ export default {
           if(result.success){
             this.closeDialog();
             this.setTask(result.data.task);
+          }else{
+            this.alert_type = 'error';
+            this.alert_messages = result.errors;
+            this.alert = true;
+            this.timeout = setTimeout(() => this.alert = false, 3000);
+          }
+        })
+        .catch(error => console.log('error', error));
+    },
+    editTask(){
+      let requestOptions = {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': this.getToken()
+        },
+        body: JSON.stringify({
+          name: this.name,
+          description: this.description,
+          start_date: this.start_date
+        })
+      }
+
+      fetch(this.api('tasks/' + this.current_task.task_id), requestOptions)
+        .then(response => response.json())
+        .then((result) => {
+          this.is_loading = false;
+
+          if(result.success){
+            this.closeDialog();
+            this.setTaskUpdate(result.data.task);
           }else{
             this.alert_type = 'error';
             this.alert_messages = result.errors;
