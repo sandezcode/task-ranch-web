@@ -4,7 +4,7 @@
       <v-toolbar-title class="ml-0 text-primary text-h4">Por hacer</v-toolbar-title>
 
       <template v-slot:append>
-        <v-switch color="success" density="compact" inset hide-details></v-switch>
+        <v-switch v-model="only_my_tasks" color="success" density="compact" inset hide-details></v-switch>
       </template>
 
       <template v-slot:extension>
@@ -30,38 +30,40 @@
           <template v-if="status">
             <template v-for="task in to_do_store.tasks">
               <v-scale-transition>
-                <template v-if="(task.status === parseInt(status)) || (status === 'all')">
-                  <v-card :width="($vuetify.display.xs) ? '100%' : '450'" variant="flat" rounded="lg" border
-                          class="pa-2 align-self-baseline border-b-xl"
-                          :class="(task.status) ? 'border-success' : 'border-warning'"
-                  >
-                    <v-card-item>
-                      <template v-slot:prepend>
-                        <v-avatar color="secondary" icon="mdi-pin" variant="tonal" size="40"></v-avatar>
-                      </template>
+                <template v-if="((only_my_tasks === true) && (task.user.user_id === user.user_id)) || (only_my_tasks === false)">
+                  <template v-if="(task.status === parseInt(status)) || (status === 'all')">
+                    <v-card :width="($vuetify.display.xs) ? '100%' : '450'" variant="flat" rounded="lg" border
+                            class="pa-2 align-self-baseline border-b-xl"
+                            :class="(task.status) ? 'border-success' : 'border-warning'"
+                    >
+                      <v-card-item>
+                        <template v-slot:prepend>
+                          <v-avatar color="secondary" icon="mdi-pin" variant="tonal" size="40"></v-avatar>
+                        </template>
 
-                      <v-card-title>{{ task.name }}</v-card-title>
-                      <v-card-subtitle>Tarea de <strong>{{ task.user.name }}</strong></v-card-subtitle>
+                        <v-card-title>{{ task.name }}</v-card-title>
+                        <v-card-subtitle>Tarea de <strong>{{ task.user.name }}</strong></v-card-subtitle>
 
-                      <template v-slot:append>
-                        <v-menu>
-                          <template v-slot:activator="{ props }">
-                            <v-btn color="tertiary" icon="mdi-dots-vertical" variant="text" position="absolute"
-                                   location="top end"
-                                   v-bind="props"
-                            ></v-btn>
-                          </template>
-                        </v-menu>
-                      </template>
-                    </v-card-item>
+                        <template v-if="task.user.user_id === user.user_id" v-slot:append>
+                          <v-menu>
+                            <template v-slot:activator="{ props }">
+                              <v-btn color="tertiary" icon="mdi-dots-vertical" variant="text" position="absolute"
+                                     location="top end"
+                                     v-bind="props"
+                              ></v-btn>
+                            </template>
+                          </v-menu>
+                        </template>
+                      </v-card-item>
 
-                    <v-card-text>{{ task.description }}</v-card-text>
+                      <v-card-text>{{ task.description }}</v-card-text>
 
-                    <v-card-subtitle class="text-right">
-                      {{ task.start_date_human }}
-                      <v-icon :color="(task.status) ? 'success' : 'warning'">mdi-circle-medium</v-icon>
-                    </v-card-subtitle>
-                  </v-card>
+                      <v-card-subtitle class="text-right">
+                        {{ task.start_date_human }}
+                        <v-icon :color="(task.status) ? 'success' : 'warning'">mdi-circle-medium</v-icon>
+                      </v-card-subtitle>
+                    </v-card>
+                  </template>
                 </template>
               </v-scale-transition>
             </template>
@@ -131,12 +133,14 @@ export default {
     this.getTasks();
   },
   data: () => ({
+    only_my_tasks: false,
     status: 'all',
     is_loading_data: true
   }),
   computed: {
     ...mapState({
       api: state => state.api,
+      user: state => state.user,
       to_do_store: state => state.to_do_store
     })
   },
