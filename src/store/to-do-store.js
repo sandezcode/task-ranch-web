@@ -51,8 +51,18 @@ const toDoStore = {
         }
       });
     },
+    setTaskDelete(state, taskId){
+      for(let i = 0; i < state.tasks.length; i++){
+        if(state.tasks[i].task_id === taskId){
+          state.tasks.splice(i, 1);
+        }
+      }
+    },
     setCurrentTask(state, currentTask){
       state.current_task = currentTask;
+    },
+    setDeleteDialog(state, status){
+      state.delete_dialog = status;
     },
     //-------------------- Reset data --------------------
     resetCurrentTask(state){
