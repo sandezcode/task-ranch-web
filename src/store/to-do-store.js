@@ -10,7 +10,13 @@ const getDefaultState = () => ({
     start_date: '',
     status: null,
     //-------------------- Custom Properties --------------------
-    // ...
+    start_date_human: '',
+    //-------------------- Model Relationships --------------------
+    user: {
+      user_id: null,
+      name: '',
+      email: ''
+    }
   },
   delete_dialog: false
 });
@@ -29,6 +35,12 @@ const toDoStore = {
           state.form_type = formStatus.form_type;
         }, 200);
       }
+    },
+    setTasks(state, tasks){
+      state.tasks = tasks;
+    },
+    setTask(state, task){
+      state.tasks.unshift(task);
     },
     //-------------------- Reset data --------------------
     resetCurrentTask(state){
