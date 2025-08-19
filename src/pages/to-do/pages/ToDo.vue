@@ -89,13 +89,13 @@
           <v-sheet color="transparent" :height="$vuetify.display.height - 180">
             <v-empty-state>
               <template v-slot:media>
-                <v-img src="@/assets/illustrations/undraw_dog_walking_w27q.png" height="200"></v-img>
+                <v-img src="@/assets/illustrations/undraw_welcoming_42an.png" height="200"></v-img>
               </template>
               <template v-slot:title>
-                ¡Todo bajo control!
+                Bienvenido a tu planificador
               </template>
               <template v-slot:text>
-                No tienes tareas pendientes en este momento. Crea una nueva y sigue avanzando con tus objetivos.
+                Empieza organizando tu día: agrega tu primera tarea y mantén el enfoque en tus objetivos.
               </template>
             </v-empty-state>
           </v-sheet>
