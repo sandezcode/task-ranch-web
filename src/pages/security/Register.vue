@@ -90,6 +90,12 @@
           Registrarme
         </v-btn>
       </v-card-actions>
+
+      <v-card-item>
+        <div class="text-medium-emphasis text-center">
+          <router-link :to="{ name: 'Login' }" class="text-tertiary text-decoration-none">Iniciar sesion</router-link>
+        </div>
+      </v-card-item>
     </v-card>
   </v-sheet>
 </template>
