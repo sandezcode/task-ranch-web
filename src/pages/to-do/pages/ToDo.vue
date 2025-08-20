@@ -40,6 +40,10 @@
                             class="pa-2 align-self-baseline border-b-xl"
                             :class="(task.status) ? 'border-success' : 'border-warning'"
                     >
+                      <template v-if="task.is_loading" v-slot:loader>
+                        <v-progress-linear color="primary" indeterminate></v-progress-linear>
+                      </template>
+
                       <v-card-item>
                         <template v-slot:prepend>
                           <v-avatar color="secondary" icon="mdi-pin" variant="tonal" size="40"></v-avatar>
@@ -79,11 +83,11 @@
                               <v-divider></v-divider>
 
                               <v-list density="compact" class="pa-2">
-                                <v-list-item base-color="torch" slim rounded="lg" :loading="is_loading"
+                                <v-list-item base-color="success" variant="tonal" slim rounded="lg"
                                              :disabled="task.status === 1"
                                              v-on:click="completeTask(task)"
                                 >
-                                  <v-list-item-title>Terminar tarea</v-list-item-title>
+                                  <v-list-item-title>Completar tarea</v-list-item-title>
                                 </v-list-item>
                               </v-list>
                             </v-card>
@@ -175,8 +179,7 @@ export default {
   data: () => ({
     only_my_tasks: false,
     status: 'all',
-    is_loading_data: true,
-    is_loading: true
+    is_loading_data: true
   }),
   computed: {
     ...mapState({
@@ -246,7 +249,7 @@ export default {
       }
     },
     completeTask(task){
-      this.is_loading = true;
+      task.is_loading = true;
 
       let requestOptions = {
         method: 'POST',
@@ -260,7 +263,7 @@ export default {
       fetch(this.api('tasks/complete-task'), requestOptions)
         .then(response => response.json())
         .then((result) => {
-          this.is_loading = false;
+          task.is_loading = false;
 
           if(result.success){
             this.setTaskUpdate(result.data.task);
