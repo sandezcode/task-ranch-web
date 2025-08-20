@@ -16,6 +16,11 @@ const routes = [
     children: [
       //---------------------------------------- Public Routes ----------------------------------------
       {
+        path: '',
+        name: 'Home',
+        component: () => import('@/pages/security/Login.vue')
+      },
+      {
         path: 'register',
         name: 'Register',
         component: () => import('@/pages/security/Register.vue')
